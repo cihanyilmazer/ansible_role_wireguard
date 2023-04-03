@@ -1,0 +1,7 @@
+[Interface]
+PrivateKey = {{ _wg_server_privatekey.stdout }}
+Address = {{ wg_server_client_network }}.1/24
+ListenPort = {{ wg_server_service_port }}
+SaveConfig = true
+PostUp = iptables -t nat -I POSTROUTING -o {{ wg_server_public_interface }} -j MASQUERADE
+PreDown = iptables -t nat -D POSTROUTING -o {{ wg_server_public_interface }} -j MASQUERADE

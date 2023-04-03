@@ -1,0 +1,6 @@
+---
+- name: restart wg-quick@wg{{ wg_server_interface_number }}
+  service:
+    name: wg-quick@wg{{ wg_server_interface_number }}
+    enabled: yes
+    state: restarted

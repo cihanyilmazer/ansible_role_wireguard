@@ -1,0 +1,49 @@
+---
+- name: Check wg{{ wg_server_interface_number }}_private.key at /etc/wireguard/
+  stat:
+    path: /etc/wireguard/wg{{ wg_server_interface_number }}_private.key
+  register: _wg_server_privatekey
+
+- name: Create wg{{ wg_server_interface_number }}_private.key at /etc/wireguard/
+  shell:
+    cmd: "{{ item }}"
+  loop:
+    - sudo wg genkey | sudo tee /etc/wireguard/wg{{ wg_server_interface_number }}_private.key
+    - sudo chmod go= /etc/wireguard/wg{{ wg_server_interface_number }}_private.key
+  when:
+    - not _wg_server_privatekey.stat.exists
+  notify:
+    - restart wg-quick@wg{{ wg_server_interface_number }}
+
+- name: Check wg{{ wg_server_interface_number }}_public.key at /etc/wireguard/
+  stat:
+    path: /etc/wireguard/wg{{ wg_server_interface_number }}_public.key
+  register: _wgserver_publickey
+
+- name: Create wg{{ wg_server_interface_number }}_public.key at /etc/wireguard/
+  shell:
+    cmd: "{{ item }}"
+  loop:
+    - sudo cat /etc/wireguard/wg{{ wg_server_interface_number }}_private.key | wg pubkey | sudo tee /etc/wireguard/wg{{ wg_server_interface_number }}_public.key
+  when:
+    - not _wgserver_publickey.stat.exists
+  notify:
+    - restart wg-quick@wg{{ wg_server_interface_number }}
+
+- name: Register wg{{ wg_server_interface_number }}_private.key
+  shell:
+    cmd: sudo cat /etc/wireguard/wg{{ wg_server_interface_number }}_private.key
+  register: _wg_server_privatekey
+
+- name: Copy wg{{ wg_server_interface_number }}.conf to /etc/wireguard/
+  template:
+    src: config.j2
+    dest: /etc/wireguard/wg{{ wg_server_interface_number }}.conf
+  notify:
+    - restart wg-quick@wg{{ wg_server_interface_number }}
+
+- name: Enable and start wg-quick@wg{{ wg_server_interface_number }}
+  service:
+    name: wg-quick@wg{{ wg_server_interface_number }}
+    enabled: yes
+    state: started

@@ -1,0 +1,6 @@
+---
+- name: Update cache and install WireGuard
+  apt:
+    name: wireguard
+    state: latest
+    update_cache: yes

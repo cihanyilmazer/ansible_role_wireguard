@@ -1,0 +1,19 @@
+---
+- name: Allow WireGuard from public
+  ufw:
+    rule: allow
+    interface_in: "{{ wg_server_public_interface }}"
+    proto: udp
+    to_port: "{{ wg_server_service_port }}"
+    src: 0.0.0.0/0
+    comment: allow wireguard from public
+
+# - name: allow wireguard routed traffic to public
+#   ufw:
+#     rule: allow
+#     route: true
+#     interface_in: "wg{{ clw_server_interface_number }}"
+#     interface_out: "{{ clw_server_public_interface }}"
+#     src: "{{ clw_server_client_network }}.0/24"
+#     dest: 0.0.0.0/0
+#     comment: allow wireguard routed traffic to public
