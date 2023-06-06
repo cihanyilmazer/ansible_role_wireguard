@@ -1,7 +1,16 @@
 ---
 - import_tasks: install.yml
-  tags: setup
+  tags:
+    - wireguard
+    - wireguard-install
+    - never
 - import_tasks: configure/tunnel.yml
-  tags: setup
+  tags:
+    - wireguard
+    - wireguard-configure-tunnel
+    - never
 - import_tasks: configure/ufw.yml
-  tags: setup
+  tags:
+    - wireguard
+    - wireguard-configure-ufw
+    - never
